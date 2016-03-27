@@ -94,42 +94,27 @@ function run_gulp(param) {
       {
         name: 'blockName',
         message: 'Enter block name:',
-        default:defaults.blockNamel
-      }, 
-      {
-        type: 'confirm',
-        name: 'addToCss',
-        message: 'Add css file to main.css?'
-      }, 
-      {
-        type: 'confirm',
-        name: 'addToJs',
-        message: 'Add javascript file to main.js?'
+        default:defaults.blockName
       }
     ];
     //Ask
-    inquirer.prompt(prompts,
-      function (answers) {
+    var exec = function (answers) {
         gulp.src(__dirname + '/templates/block/*')
-          
           .pipe(rename(function (file) {
             file.basename = answers.blockName
           }))
           .pipe(template(answers))
           .pipe(conflict('./'+defaults.folder+'/'+answers.blockName))
           .pipe(gulp.dest('./'+defaults.folder+'/'+answers.blockName));
-        if (answers.addToCss) {
-          gulp.src('./'+defaults.folder+'/main.css')
-            .pipe(insert.append('\n@import "../blocks/'+answers.blockName+'/'+answers.blockName+'";'))
-            .pipe(gulp.dest('./'+defaults.folder+'/'));
-        }
-        if (answers.addToJs) {
-          gulp.src('./'+defaults.folder+'/main.js')
-            .pipe(insert.append('\n//= ../blocks/'+answers.blockName+'/'+answers.blockName+'.js'))
-            .pipe(gulp.dest('./'+defaults.folder+'/'));
-        }
-      }
-    );
+    };
+
+    if (gulp.args[0])
+    {
+      exec(defaults);
+      return;
+    }
+    //Ask
+    inquirer.prompt(prompts,exec);
   }
   else if (param == "elem"){
     var prompts = [
@@ -169,33 +154,4 @@ function run_gulp(param) {
     inquirer.prompt(prompts,
       exec);
   } 
-  else if (param == "page") 
-  {
-    var prompts = [
-      {
-        name: 'pageName',
-        message: 'Enter page name:',
-      }
-    ];
-    //Ask
-    inquirer.prompt(prompts,
-      function (answers) {
-          //answers.appNameSlug = _.slugify(answers.appName);
-          gulp.src(__dirname + '/templates/**')
-              .pipe(template(answers))
-              .pipe(rename(function (file) {
-                  if (file.basename[0] === '_') {
-                      file.basename = '.' + file.basename.slice(1);
-                  }
-              }))
-              .pipe(conflict('./'))
-              .pipe(gulp.dest('./'))
-              .pipe(install())
-              .on('end', function () {
-                  done();
-              });
-      }
-    );
-  }
-
 }
