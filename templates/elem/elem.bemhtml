@@ -1,0 +1,3 @@
+block('<%= blockName %>').mod('<%= modName %>').elem('<%= elemName %>').elemMod('<%= eleModName %>')(
+
+);
